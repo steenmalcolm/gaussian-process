@@ -1,5 +1,5 @@
 #include "RBFKernel.h"
-#include <cmath>  // For exp and pow functions
+#include <cmath>  // exp, pow
 
 RBFKernel::RBFKernel(double length_scale) : length_scale(length_scale) {}
 

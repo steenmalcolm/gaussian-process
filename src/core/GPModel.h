@@ -11,7 +11,7 @@ public:
     ~GPModel() = default;
 
     // Fit the Gaussian Process to training data
-    void fit(const Eigen::VectorXd& x_train, const Eigen::VectorXd& y_train);
+    void fit(const Eigen::VectorXd& x_train, const Eigen::VectorXd& y_train, double sigma);
 
     // Predict the output and its standard debiation for given input(s) x
     Eigen::MatrixXd predict(const Eigen::VectorXd& x_test);
@@ -25,6 +25,7 @@ private:
     Eigen::VectorXd x_train;
     Eigen::VectorXd y_train;
     Eigen::MatrixXd K_inv;  // Inverse of kernel matrix
+    double sigma;
 
     void computeKernelInverse();
 };

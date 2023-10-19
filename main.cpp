@@ -20,15 +20,16 @@ int main() {
 
     // 2. Instantiate an RBF kernel and set its length scale.
     double length_scale = 1.0;
+    double sigma = 0.5;
     RBFKernel rbfKernel(length_scale);
 
     // 3. Train the Gaussian Process model on the dataset.
     GPModel gp(&rbfKernel);
-    gp.fit(x_train, y_train);
+    gp.fit(x_train, y_train, sigma);
 
     // 4. Predict on a new set of test points.
     Eigen::VectorXd x_test(3);
-    x_test << 1.5, 2.5, 3.5;
+    x_test << 1., 2., 3.;
     Eigen::MatrixXd predictionsWithStd(3, 2);
     predictionsWithStd = gp.predict(x_test);
 

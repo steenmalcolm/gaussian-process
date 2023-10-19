@@ -5,10 +5,11 @@ using namespace std;
 
 GPModel::GPModel(KernelBase* kernel) : kernel(kernel) {}
 
-void GPModel::fit(const Eigen::VectorXd& x_train, const Eigen::VectorXd& y_train) {
+void GPModel::fit(const Eigen::VectorXd& x_train, const Eigen::VectorXd& y_train, double sigma) {
 
     this->x_train = x_train;
     this->y_train = y_train;
+    this->sigma = sigma;
  
     computeKernelInverse();
 }
@@ -33,7 +34,7 @@ Eigen::MatrixXd GPModel::predict(const Eigen::VectorXd& x_test) {
 
         double k_star_star = kernel->compute(x_test(i), x_test(i));  
         double variance = k_star_star - k_star.dot(K_inv*k_star);
-        std[i] = sqrt(variance);
+        std[i] = sqrt(variance) + sigma;
     }
 
     Eigen::MatrixXd predictionsWithStd(n_test,2);
@@ -50,5 +51,6 @@ void GPModel::setKernel(KernelBase* kernel) {
 
 void GPModel::computeKernelInverse() {
     kernel->computeMatrix(x_train, K_inv);
+    K_inv = K_inv + sigma*sigma*Eigen::MatrixXd::Identity(x_train.size(), x_train.size());
     K_inv = K_inv.inverse();
 }
