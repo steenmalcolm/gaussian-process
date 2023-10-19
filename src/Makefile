@@ -8,14 +8,14 @@ OBJS = core/GPModel.o kernels/KernelBase.o kernels/RBFKernel.o
 
 all: $(OBJS)
 
-core/GPModel.o: core/GPModel.cpp core/GPModel.h kernels/KernelBase.h
-	$(CXX) $(CXXFLAGS) $(INC) -c core/GPModel.cpp -o core/GPModel.o
-
 kernels/RBFKernel.o: kernels/RBFKernel.cpp kernels/RBFKernel.h kernels/KernelBase.h
 	$(CXX) $(CXXFLAGS) $(INC) -c kernels/RBFKernel.cpp -o kernels/RBFKernel.o
 
 kernels/KernelBase.o: kernels/KernelBase.cpp kernels/KernelBase.h
 	$(CXX) $(CXXFLAGS) $(INC) -c kernels/KernelBase.cpp -o kernels/KernelBase.o
+
+core/GPModel.o: core/GPModel.cpp core/GPModel.h kernels/KernelBase.h
+	$(CXX) $(CXXFLAGS) $(INC) -c core/GPModel.cpp -o core/GPModel.o
 
 clean:
 	rm -f $(OBJS)

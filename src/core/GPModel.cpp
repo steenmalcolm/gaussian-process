@@ -5,7 +5,7 @@ using namespace std;
 
 GPModel::GPModel(KernelBase* kernel) : kernel(kernel) {}
 
-void GPModel::fit(const Eigen::VectorXd& x_train, const Eigen::VectorXd& y_train, double sigma) {
+void GPModel::fit(const Eigen::MatrixXd& x_train, const Eigen::VectorXd& y_train, double sigma) {
 
     this->x_train = x_train;
     this->y_train = y_train;
@@ -14,27 +14,27 @@ void GPModel::fit(const Eigen::VectorXd& x_train, const Eigen::VectorXd& y_train
     computeKernelInverse();
 }
 
-Eigen::MatrixXd GPModel::predict(const Eigen::VectorXd& x_test) {
-    size_t n_train = x_train.size();
-    size_t n_test = x_test.size();
+Eigen::MatrixXd GPModel::predict(const Eigen::MatrixXd& x_test) {
+    long int n_train = static_cast<int>(x_train.rows());
+    long int n_test = static_cast<int>(x_test.rows());
 
     Eigen::VectorXd predictions(n_test);
     Eigen::VectorXd std(n_test);
 
-    for (size_t i=0; i < n_test; i++) {
+    for (long int i=0; i < n_test; i++) {
         Eigen::VectorXd k_star(n_train);
-        for (size_t j=0; j < n_train; j++) {
-            k_star(j) = kernel->compute(x_test(i), x_train(j));
+        for (long int j=0; j < n_train; j++) {
+            k_star(j) = kernel->compute(x_test.row(i), x_train.row(j));
         }
         // Calculate the mean prediction
         double prediction = k_star.dot(K_inv*y_train);
-        predictions[i] = prediction;
+        predictions(i) = prediction;
 
         // Calculate the standard deviation
 
-        double k_star_star = kernel->compute(x_test(i), x_test(i));  
+        double k_star_star = kernel->compute(x_test.row(i), x_test.row(i));  
         double variance = k_star_star - k_star.dot(K_inv*k_star);
-        std[i] = sqrt(variance) + sigma;
+        std(i) = sqrt(variance) + sigma;
     }
 
     Eigen::MatrixXd predictionsWithStd(n_test,2);
@@ -50,7 +50,11 @@ void GPModel::setKernel(KernelBase* kernel) {
 }
 
 void GPModel::computeKernelInverse() {
+    cout << "debug 3.1" << endl;
     kernel->computeMatrix(x_train, K_inv);
-    K_inv = K_inv + sigma*sigma*Eigen::MatrixXd::Identity(x_train.size(), x_train.size());
+    cout << "debug 3.2" << endl;
+    long int n_train = static_cast<int>(x_train.rows());
+    K_inv = K_inv + sigma*sigma*Eigen::MatrixXd::Identity(n_train, n_train);
     K_inv = K_inv.inverse();
+    cout << "debug 3.3" << endl;
 }

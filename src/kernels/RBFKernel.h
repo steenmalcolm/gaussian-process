@@ -9,7 +9,7 @@ public:
     RBFKernel(double length_scale);
     
     // Override the compute method from KernelBase
-    double compute(double x1, double x2) const override;
+    double compute(Eigen::VectorXd x1, Eigen::VectorXd x2) const override;
 
     // Getter and setter for the length_scale parameter
     double getLengthScale() const;
