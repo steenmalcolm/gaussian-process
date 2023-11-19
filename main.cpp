@@ -1,7 +1,7 @@
 #include "KernelBase.h"
 #include "RBFKernel.h"
 #include "GPModel.h"
-// #include "DataLoader.h"  // Assuming you have a DataLoader utility to load datasets.
+#include "GradientDescent.h"
 #include <iostream>
 #include <Eigen/Dense>
 #include <cmath>
@@ -23,32 +23,25 @@ int main() {
         }
     }
 
-    cout << "debug 1" << endl;
-    // Assuming a DataLoader utility to load a hypothetical dataset from a CSV file.
-    // DataLoader::loadFromCSV("data/sample_dataset.csv", x_train, y_train); 
-
     // 2. Instantiate an RBF kernel and set its length scale.
     double length_scale = 1.0;
     double sigma = 0.1;
     RBFKernel rbfKernel(length_scale);
 
-    cout << "debug 2" << endl;
     // 3. Train the Gaussian Process model on the dataset.
     GPModel gp(&rbfKernel);
-    cout << "debug 3" << endl;
     gp.fit(x_train, y_train, sigma);
-    cout << "debug 4" << endl;
 
     // 4. Predict on a new set of test points.
     Eigen::MatrixXd x_test(15,2);
     x_test << 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7,
-              8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 
+              8, 8, 9, 9, 10, 10, 11, 11, 12, 12,
               13, 13, 14, 14, 15, 15;
     Eigen::MatrixXd predictionsWithStd(15, 2);
     predictionsWithStd = gp.predict(x_test);
     cout << "debug 5" << endl;
 
-    // 5. Display the predictions.
+    // 5. Display the predictions
     std::cout << "Predictions:" << std::endl;
     for (int i = 0; i < 15; ++i) {
         std::cout << "x = " << x_test.row(i) << ", y = " << predictionsWithStd(i,0)

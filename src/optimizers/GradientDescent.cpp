@@ -1,21 +1,23 @@
 #include "GradientDescent.h"
+#include <functional>
 #include <iostream>
 #include <ctime>
 
 GradientDescentOptimizer::GradientDescentOptimizer(
-    double (*func)(const Eigen::VectorXd&),
-    const Eigen::VectorXd& start_point,
-    double lr,
-    int iters,
-    const Eigen::VectorXd& lower_bounds,
-    const Eigen::VectorXd& upper_bounds,
-    float eps,
-    int reps,
-    int step,
-    float kappa)
-    : func(func), point(start_point), learning_rate(lr), iterations(iters),
+    std::function<double(const Eigen::VectorXd&)> func,
+    const Eigen::VectorXd& start_point, // Starting point for optimization
+    double lr, // Learning rate
+    int iters, // Number of iterations to run
+    const Eigen::VectorXd& lower_bounds, // Lower bounds for each dimension (optional)
+    const Eigen::VectorXd& upper_bounds, // Upper bounds for each dimension (optional)
+    float eps, // Convergence threshold
+    int reps, // Number of times to repeat the optimization
+    int step, // Number of iterations between learning rate decay
+    float kappa, // Decay rate for learning rate
+    float h // Step size for numerical gradient
+    ) : func(func), point(start_point), learning_rate(lr), iterations(iters),
       epsilon(eps), repeats(reps), step_size(step), decay_rate(kappa),
-      lower_bounds(lower_bounds), upper_bounds(upper_bounds) {}
+      lower_bounds(lower_bounds), upper_bounds(upper_bounds), h(h) {}
 
 Eigen::VectorXd GradientDescentOptimizer::minimize() {
     srand((unsigned int)time(NULL));
@@ -41,22 +43,21 @@ Eigen::VectorXd GradientDescentOptimizer::minimize() {
             within_bounds = checkBounds(point);
 
             point -= learning_rate * grad;
-        }
-
-        if (func(point) < func(min_point)) {
-            min_point = point;
-            std::cout << "New minimum point: " << min_point.transpose() << " value " << func(min_point) << std::endl;
+            if (func(point) < func(min_point)){
+                min_point = point;
+                std::cout << "New minimum point: " << min_point.transpose() << " value " << func(min_point) << std::endl;
+            }
         }
     }
 
     return min_point;
 }
 
-Eigen::VectorXd GradientDescentOptimizer::numericalGradient(double (*func)(const Eigen::VectorXd&), const Eigen::VectorXd& v) {
+Eigen::VectorXd GradientDescentOptimizer::numericalGradient(std::function<double(const Eigen::VectorXd&)> func, const Eigen::VectorXd& v) {
     double h = 1e-5;
     Eigen::VectorXd grad(v.size());
-    Eigen::VectorXd v_plus = v;
     for (int i = 0; i < v.size(); ++i) {
+        Eigen::VectorXd v_plus = v;
         v_plus[i] += h;
         grad[i] = (func(v_plus) - func(v)) / h;
     }
@@ -72,9 +73,10 @@ Eigen::VectorXd GradientDescentOptimizer::randomizeStartPoint() {
 
 bool GradientDescentOptimizer::checkBounds(const Eigen::VectorXd& pt) {
     if (lower_bounds.size() > 0 && upper_bounds.size() > 0) {
-        for (int i = 0; i < pt.size(); ++i)
+        for (int i = 0; i < pt.size(); ++i){
             if (pt[i] < lower_bounds[i] || pt[i] > upper_bounds[i])
                 return false;
+        }
     }
     return true;
 }

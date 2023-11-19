@@ -1,8 +1,9 @@
 #ifndef GPMODEL_H
 #define GPMODEL_H
 
-#include <Eigen/Dense>
 #include "KernelBase.h"
+#include "GradientDescent.h"
+#include <Eigen/Dense>
 
 class GPModel {
 public:
@@ -28,6 +29,7 @@ private:
     double sigma;
 
     void computeKernelInverse();
+    double log_min_likelihood(const Eigen::VectorXd& params);
 };
 
 #endif // GPMODEL_H

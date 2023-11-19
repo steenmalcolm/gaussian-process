@@ -2,11 +2,12 @@
 #define GRADIENT_DESCENT_OPTIMIZER_H
 
 #include <Eigen/Dense>
+#include <functional>
 
 class GradientDescentOptimizer {
 public:
     GradientDescentOptimizer(
-        double (*func)(const Eigen::VectorXd&),
+        std::function<double(const Eigen::VectorXd&)> func,
         const Eigen::VectorXd& start_point,
         double lr,
         int iters,
@@ -15,12 +16,13 @@ public:
         float eps = 1e-6,
         int reps = 1000,
         int step = 100,
-        float kappa = 0.99);
+        float kappa = 0.99,
+        float h = 1e-5);
 
     Eigen::VectorXd minimize();
 
 private:
-    double (*func)(const Eigen::VectorXd&);
+    std::function<double(const Eigen::VectorXd&)> func;
     Eigen::VectorXd point;
     double learning_rate;
     int iterations;
@@ -29,8 +31,9 @@ private:
     int step_size;
     float decay_rate;
     Eigen::VectorXd lower_bounds, upper_bounds;
+    float h;
 
-    Eigen::VectorXd numericalGradient(double (*func)(const Eigen::VectorXd&), const Eigen::VectorXd& v);
+    Eigen::VectorXd numericalGradient(std::function<double(const Eigen::VectorXd&)> func, const Eigen::VectorXd& v);
     Eigen::VectorXd randomizeStartPoint();
     bool checkBounds(const Eigen::VectorXd& pt);
 };
