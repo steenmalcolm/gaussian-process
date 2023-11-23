@@ -2,3 +2,4 @@ libs/*
 data/*
 *.o
 *.exe
+.vscode

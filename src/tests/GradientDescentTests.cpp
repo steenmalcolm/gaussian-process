@@ -1,4 +1,3 @@
-// Class that implements the unit tests for the GradientDescent class.  
 #include <iostream>
 #include "GradientDescent.h"
 #include <Eigen/Dense>
@@ -59,11 +58,3 @@ public:
         brute_force_minimizer();
     }
 };
-
-
-int main() {
-    GradientDescentTests tests;
-
-    tests.testMinimizer();
-    return 0;
-}

@@ -8,11 +8,11 @@
 class GPModel {
 public:
     // Constructor & Destructor
-    GPModel(KernelBase* kernel);
+    GPModel(KernelBase* kernel, double sigma);
     ~GPModel() = default;
 
     // Fit the Gaussian Process to training data
-    void fit(const Eigen::MatrixXd& x_train, const Eigen::VectorXd& y_train, double sigma);
+    void fit(const Eigen::MatrixXd& x_train, const Eigen::VectorXd& y_train);
 
     // Predict the output and its standard debiation for given input(s) x
     Eigen::MatrixXd predict(const Eigen::MatrixXd& x_test);

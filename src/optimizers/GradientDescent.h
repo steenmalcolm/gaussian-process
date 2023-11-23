@@ -18,6 +18,17 @@ public:
         int step = 100,
         float kappa = 0.99,
         float h = 1e-5);
+    // std::function<double (Eigen::Matrix<double, -1, 1, 0, -1, 1> const&)>
+    // Eigen::Matrix<double, -1, 1, 0, -1, 1> const&
+    // double
+    // int
+    // Eigen::Matrix<double, -1, 1, 0, -1, 1> const&
+    // Eigen::Matrix<double, -1, 1, 0, -1, 1> const&
+    // float
+    // int
+    // int
+    // float
+    // float
 
     Eigen::VectorXd minimize();
 

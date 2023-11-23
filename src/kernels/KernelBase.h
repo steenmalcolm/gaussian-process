@@ -17,12 +17,8 @@ public:
     // Virtual function to set the hyperparameters of the kernel
     virtual void setHyperparameters(const Eigen::VectorXd& params) = 0;
 
-    // Getter and setter for the sigma parameter
-    double getSigma() const;
-    void setSigma(double sigma);
+    virtual Eigen::VectorXd getHyperparameters() const = 0;
 
-private:
-    double sigma;
 };
 
 #endif // KERNELBASE_H

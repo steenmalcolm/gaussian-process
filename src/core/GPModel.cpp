@@ -3,26 +3,35 @@
 #include "GradientDescent.h"
 #include <Eigen/Dense>  // Eigen library for matrix operations
 #include <functional>
+#include <numbers>
 using namespace std;
 
-GPModel::GPModel(KernelBase* kernel) : kernel(kernel) {}
+GPModel::GPModel(KernelBase* kernel, double sigma) : kernel(kernel), sigma(sigma) {}
 
-void GPModel::fit(const Eigen::MatrixXd& x_train, const Eigen::VectorXd& y_train, double sigma) {
+void GPModel::fit(const Eigen::MatrixXd& x_train, const Eigen::VectorXd& y_train) {
 
     this->x_train = x_train;
     this->y_train = y_train;
-    this->sigma = sigma;
     
     // Define parameters for gradient descent
-    const Eigen::VectorXd start_point = Eigen::VectorXd::Constant(1., 1.);
     double lr = 0.01;
     int iters = 1000;
-    const Eigen::VectorXd lower_bounds = Eigen::VectorXd::Constant(1e-5, 1e-5);
-    const Eigen::VectorXd upper_bounds = Eigen::VectorXd::Constant(1e3, 1e3);
+    int n_params = kernel->getHyperparameters().size() + 1; // +1 for sigma
+    const Eigen::VectorXd start_point = Eigen::VectorXd::Constant(n_params, 1.);
+    const Eigen::VectorXd lower_bounds = Eigen::VectorXd::Constant(n_params, 1e-5);
+    const Eigen::VectorXd upper_bounds = Eigen::VectorXd::Constant(n_params, 1e3);
 
 
     auto bound_log_min_likelihood = std::bind(&GPModel::log_min_likelihood, this, std::placeholders::_1);
-    GradientDescentOptimizer optimizer(bound_log_min_likelihood, start_point, lr, iters, lower_bounds, upper_bounds);
+
+    GradientDescentOptimizer optimizer(
+        bound_log_min_likelihood,
+        start_point,
+        lr,
+        iters,
+        lower_bounds,
+        upper_bounds);
+
     Eigen::VectorXd params = optimizer.minimize();
     kernel->setHyperparameters(params);
 
@@ -67,10 +76,12 @@ void GPModel::setKernel(KernelBase* kernel) {
 
 double GPModel::log_min_likelihood(const Eigen::VectorXd& params) {
 
-    kernel->setHyperparameters(params);
+    sigma = params(0);
+    kernel->setHyperparameters(params.tail(params.size()-1));
     computeKernelInverse();
     long int n_train = static_cast<int>(x_train.rows());
-    double log_likelihood = -0.5*y_train.transpose()*K_inv*y_train - 0.5*log(K_inv.determinant()) - n_train/2.0*log(2*M_PI);
+    Eigen::MatrixXd K_tilde = K_inv + sigma*sigma*Eigen::MatrixXd::Identity(n_train, n_train);
+    double log_likelihood = -0.5*y_train.transpose()*(K_tilde)*y_train - 0.5*log(K_tilde.determinant()) - n_train/2.0*log(2*std::numbers::pi);
     // Return negative log likelihood because we are using a minimizer but we want to maximize the likelihood
     return -log_likelihood;
 }
