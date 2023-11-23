@@ -1,8 +1,8 @@
 #ifndef GPMODEL_H
 #define GPMODEL_H
 
-#include "KernelBase.h"
-#include "GradientDescent.h"
+#include "kernels/KernelBase.h"
+#include "optimizers/GradientDescent.h"
 #include <Eigen/Dense>
 
 class GPModel {

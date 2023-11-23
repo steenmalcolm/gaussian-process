@@ -1,5 +1,5 @@
 #include <iostream>
-#include "KernelBase.h"
+#include "kernels/KernelBase.h"
 #include <Eigen/Dense>
 using namespace std;
 

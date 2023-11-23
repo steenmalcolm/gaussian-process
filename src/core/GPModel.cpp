@@ -1,6 +1,6 @@
 #include <iostream>
-#include "GPModel.h"
-#include "GradientDescent.h"
+#include "core/GPModel.h"
+#include "optimizers/GradientDescent.h"
 #include <Eigen/Dense>  // Eigen library for matrix operations
 #include <functional>
 #include <numbers>

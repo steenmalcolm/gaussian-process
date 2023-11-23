@@ -1,7 +1,6 @@
-#include "KernelBase.h"
-#include "RBFKernel.h"
-#include "GPModel.h"
-#include "GradientDescent.h"
+#include "kernels/RBFKernel.h"
+#include "core/GPModel.h"
+#include "optimizers/GradientDescent.h"
 #include <iostream>
 #include <Eigen/Dense>
 #include <cmath>

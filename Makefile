@@ -1,28 +1,44 @@
-# Compiler and Flags
-CXX = g++ # or you can use clang++ or other C++ compilers
-CXXFLAGS = -Wall -std=c++20 # adjust your C++ standard as needed
-INC_DIRS := $(shell find src -type d) libs
-INC := $(addprefix -I,$(INC_DIRS))
-# INC = -Isrc/core -Isrc/kernels -Isrc/optimizers -Ilibs 
-# Directories
-BUILD_DIR = build
+# Compiler settings - Can be customized.
+CXX = g++
+CXXFLAGS = -Wall -Iinclude -Ilibs -std=c++11
 
-# Files
-OBJECTS = src/optimizers/GradientDescent.o src/core/GPModel.o  src/kernels/KernelBase.o  src/kernels/RBFKernel.o 
+# Define the directories.
+SRCDIR = src
+OBJDIR = obj
+LIBDIR = libs
+INCDIR = include
 
-# Target binary
-TARGET = gaussian_process
+# Define the target executable
+TARGET = main
 
+# Find all the CPP files in the src/ directory.
+SRCS = $(wildcard $(SRCDIR)/*/*.cpp)
+
+# For each CPP file, generate the corresponding object file.
+OBJS = $(SRCS:$(SRCDIR)/%.cpp=$(OBJDIR)/%.o)
+
+# Default target.
 all: $(TARGET)
 
-$(TARGET): $(BUILD_DIR)/main.o $(OBJECTS)
-	$(CXX) $(CXXFLAGS) $(INC) $^ -o $@
+# Link the target with all the object files.
+$(TARGET): $(OBJS)
+	$(CXX) $(CXXFLAGS) -o $@ $^
 
-$(BUILD_DIR)/main.o: main.cpp
-	$(CXX) $(CXXFLAGS) $(INC) -c $< -o $@
+# Compile the source files into object files.
+$(OBJDIR)/%.o: $(SRCDIR)/%.cpp | $(OBJDIR)
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-%.o: %.cpp
-	$(CXX) $(CXXFLAGS) $(INC) -c $< -o $@
+# Create the directory for object files.
+$(OBJDIR):
+	mkdir $@
 
+# Clean up build.
 clean:
-	rm  $(BUILD_DIR)/* $(TARGET)
+	rm -rf $(OBJDIR) $(TARGET)
+
+# Include dependencies.
+-include $(OBJS:.o=.d)
+
+# Calculate dependencies.
+$(OBJDIR)/%.d: $(SRCDIR)/%.cpp | $(OBJDIR)
+	@$(CXX) $(CXXFLAGS) -MM -MT '$(patsubst $(SRCDIR)/%.cpp,$(OBJDIR)/%.o,$<)' $< > $@

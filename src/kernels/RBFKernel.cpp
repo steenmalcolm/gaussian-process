@@ -1,4 +1,4 @@
-#include "RBFKernel.h"
+#include "kernels/RBFKernel.h"
 #include <cmath>
 
 RBFKernel::RBFKernel(double length_scale, double sigma) : length_scale(length_scale), sigma(sigma) {}

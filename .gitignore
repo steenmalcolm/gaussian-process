@@ -1,5 +1,6 @@
 libs/*
 data/*
 *.o
+*.d
 *.exe
 .vscode
